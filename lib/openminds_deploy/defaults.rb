@@ -1,4 +1,4 @@
-configuration = Capistrano::Configuration.respond_to?(:instance) ? Capistrano::Configuration.instance(:must_exist) : Capistrano.configuration(:must_exist)
+configuration = Capistrano.configuration(:must_exist)
 
 configuration.load do
   set :use_sudo, false
