@@ -1,39 +1,39 @@
-configuration = Capistrano::Configuration.respond_to?(:instance) ? Capistrano::Configuration.instance(:must_exist) : Capistrano.configuration(:must_exist)
+module Capistrano
+  Configuration.instance(true).load do
+    # Lighttpd stuff
+    namespace :lighttpd do
+      desc 'Restart the web server'
+      task :restart, :roles => :app do
+        run 'lighty restart'
+      end
 
-configuration.load do
-  # Lighttpd stuff
-  namespace :lighttpd do
-    desc 'Restart the web server'
-    task :restart, :roles => :app do
-      run 'lighty restart'
+      desc 'Stop the web server'
+      task :stop, :roles => :app do
+        run 'lighty stop'
+      end
+
+      desc 'Start the web server'
+      task :start, :roles => :app do
+        run 'lighty start'
+      end
     end
 
-    desc 'Stop the web server'
-    task :stop, :roles => :app do
-      run 'lighty stop'
-    end
+    # Standard deploy actions overwritten
+    namespace :deploy do
+      desc 'Restart your application'
+      task :restart do
+        lighttpd::restart
+      end
 
-    desc 'Start the web server'
-    task :start, :roles => :app do
-      run 'lighty start'
-    end
-  end
+      desc 'Start your application'
+      task :start do
+        lighttpd::start
+      end
 
-  # Standard deploy actions overwritten
-  namespace :deploy do
-    desc 'Restart your application'
-    task :restart do
-      lighttpd::restart
+      desc 'Stop your application'
+      task :stop do
+        lighttpd::stop
+      end
     end
-
-    desc 'Start your application'
-    task :start do
-      lighttpd::start
-    end
-
-    desc 'Stop your application'
-    task :stop do
-      lighttpd::stop
-    end
-  end
+  end if Capistrano.const_defined? :Configuration and Capistrano::Configuration.methods.map(&:to_sym).include? :instance
 end
